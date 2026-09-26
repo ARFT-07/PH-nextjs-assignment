@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FitLog
 
-## Getting Started
+Dark-themed workout library + planner built for the B14-A6 assignment. Browse lifts, dump a few into today's plan, mark them done, come back tomorrow.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Next.js 16 (App Router, Turbopack) · React 19 · Tailwind v4 · lucide-react
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Data
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Pulls the 12 workouts from `https://api.abcz.workers.dev/api/fitlog`. `src/lib/api.js` normalizes whatever field names the API sends so the UI doesn't care about the exact shape.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pages
 
-## Learn More
+- `/` — hero + library grid, sortable by duration/calories/rating
+- `/workout/[id]` — full detail: specs, instructions, add to plan / save
+- `/my-plan` — today's plan (cap 5) + saved list, tabs, live metrics
+- 404 for anything else
 
-To learn more about Next.js, take a look at the following resources:
+## State
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Plan + saved lists live in `PlanContext`, backed by `localStorage` — survives a refresh, no backend needed. Toasts run through their own `ToastContext`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Images use plain `<img>` tags, not `next/image`, since the API's image domain isn't known ahead of time.
+- Fonts (Oswald/Inter) load via `next/font/google` at build time — needs a normal internet connection to build.
