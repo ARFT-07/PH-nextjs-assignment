@@ -1,20 +1,19 @@
 import { Oswald, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
-import { ToastProvider } from "@/context/toast-context";
-import { PlanProvider } from "@/context/plan-context";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { ToastProvider } from "@/context/ToastContext";
+import { PlanProvider } from "@/context/PlanContext";
 
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -26,7 +25,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${oswald.variable} ${inter.variable} h-full`}>
-      <body className="flex min-h-full flex-col bg-background text-white antialiased">
+      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
         <ToastProvider>
           <PlanProvider>
             <Navbar />

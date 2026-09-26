@@ -1,66 +1,133 @@
-// lib/api.js
-// Thin data-access layer around the FitLog API.
-// Every fetch call and shape-normalization for workout data lives here so
-// pages/components never talk to `fetch` directly.
+const API_BASE = "https://api.abcz.workers.dev/api/fitlog";
 
-const BASE_URL = "https://api.abcz.workers.dev/api/fitlog";
+function firstDefined(...values) {
+  for (const v of values) {
+    if (v !== undefined && v !== null && v !== "") return v;
+  }
+  return undefined;
+}
 
-/**
- * Normalizes a raw API workout record into the shape the UI expects.
- * Keeps the rest of the app decoupled from the upstream field names.
- */
-function normalizeWorkout(raw) {
+function toArray(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  if (value === undefined || value === null) return [];
+  return [value];
+}
+
+function toNumber(value, fallback = 0) {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const match = value.match(/-?\d+(\.\d+)?/);
+    if (match) return parseFloat(match[0]);
+  }
+  return fallback;
+}
+
+function idOf(raw, index) {
+  const id = firstDefined(raw.id, raw._id, raw.uuid, raw.slug, raw.workoutId);
+  return id !== undefined ? String(id) : String(index);
+}
+
+export function normalizeWorkout(raw, index = 0) {
+  if (!raw || typeof raw !== "object") return null;
+
+  const name = firstDefined(
+    raw.name,
+    raw.title,
+    raw.workoutName,
+    raw.exercise,
+    raw.exerciseName
+  ) || "UNTITLED WORKOUT";
+
+  const categories = toArray(
+    firstDefined(raw.category, raw.categories, raw.tags, raw.muscleGroup, raw.muscleGroups)
+  );
+
+  const equipmentList = toArray(
+    firstDefined(raw.equipment, raw.equipments, raw.gear)
+  );
+
+  const durationRaw = firstDefined(raw.duration, raw.durationMinutes, raw.time);
+  const duration = toNumber(durationRaw, 20);
+
+  const caloriesRaw = firstDefined(raw.calories, raw.calorie, raw.kcal);
+  const calories = toNumber(caloriesRaw, 150);
+
+  const ratingRaw = firstDefined(raw.rating, raw.stars, raw.score);
+  const rating = toNumber(ratingRaw, 4.5);
+
+  const difficulty = firstDefined(raw.difficulty, raw.level, raw.intensity) || "Beginner";
+
+  const sets = firstDefined(raw.sets, raw.setCount);
+  const reps = firstDefined(raw.reps, raw.repRange, raw.repetitions);
+
+  const description = firstDefined(
+    raw.description,
+    raw.subtitle,
+    raw.desc,
+    raw.summary
+  ) || "";
+
+  const instructions = toArray(
+    firstDefined(raw.instructions, raw.steps, raw.howTo, raw.directions)
+  );
+
+  const image = firstDefined(
+    raw.image,
+    raw.img,
+    raw.thumbnail,
+    raw.thumb,
+    raw.photo,
+    raw.picture
+  );
+
   return {
-    id: raw.id,
-    name: raw.name,
-    image: raw.image,
-    tags: raw.muscleGroups ?? [],
-    equipment: raw.equipment,
-    difficulty: raw.difficulty,
-    duration: raw.duration, // minutes
-    calories: raw.caloriesBurned,
-    sets: raw.sets,
-    reps: raw.reps,
-    rating: raw.rating,
-    description: raw.description,
-    instructions: raw.instructions ?? [],
+    id: idOf(raw, index),
+    name: String(name).toUpperCase(),
+    categories: categories.length ? categories : ["GENERAL"],
+    equipment: equipmentList,
+    equipmentLabel: equipmentList.join(", ") || "Bodyweight",
+    duration,
+    calories,
+    rating,
+    difficulty,
+    sets: sets !== undefined ? sets : "3",
+    reps: reps !== undefined ? reps : "10-12",
+    description,
+    instructions,
+    image,
+    raw,
   };
 }
 
-/**
- * Fetches every workout in the library.
- * Used by the Home page's Library section.
- */
-export async function getAllWorkouts() {
-  const res = await fetch(BASE_URL, {
-    // Data is close to static; revalidate every 5 minutes.
-    next: { revalidate: 300 },
-  });
-
+export async function fetchWorkouts() {
+  const res = await fetch(API_BASE, { cache: "no-store" });
   if (!res.ok) {
     throw new Error(`Failed to load workouts (${res.status})`);
   }
-
   const data = await res.json();
-  return data.map(normalizeWorkout);
+  const list = Array.isArray(data) ? data : data?.data || data?.workouts || data?.results || [];
+  return list.map((raw, i) => normalizeWorkout(raw, i)).filter(Boolean);
 }
 
-/**
- * Fetches a single workout by id.
- * Used by the Workout Detail page.
- */
-export async function getWorkoutById(id) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    next: { revalidate: 300 },
-  });
-
-  if (res.status === 404) return null;
-  if (!res.ok) {
-    throw new Error(`Failed to load workout ${id} (${res.status})`);
+export async function fetchWorkoutById(id) {
+  try {
+    const res = await fetch(`${API_BASE}/${id}`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      const raw = data?.data || data;
+      if (raw && !Array.isArray(raw)) {
+        return normalizeWorkout(raw, 0);
+      }
+    }
+  } catch {
   }
 
-  const data = await res.json();
-  // Some APIs wrap single-item responses in an array — handle both.
-  const raw = Array.isArray(data) ? data[0] : data;
-  return raw ? normalizeWorkout(raw) : null;
+  const all = await fetchWorkouts();
+  return all.find((w) => w.id === String(id)) || null;
 }

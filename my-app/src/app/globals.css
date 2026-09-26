@@ -1,28 +1,28 @@
 @import "tailwindcss";
+@plugin "daisyui";
 
 :root {
-  --background: #0f1115;
-  --foreground: #ffffff;
-
-  --surface: #15171d;
-  --surface-2: #1a1d24;
-  --border-subtle: #262b33;
-  --muted: #9ca3af;
-
+  --background: #0a0a0a;
+  --surface: #131313;
+  --surface-2: #191919;
+  --border: #262626;
+  --foreground: #f5f5f0;
+  --muted: #9c9c94;
   --accent: #ccff00;
-  --accent-dark: #a6d400;
+  --accent-foreground: #0a0a0a;
+  --danger: #ff4d4d;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
-  --color-border-subtle: var(--border-subtle);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
-  --color-accent-dark: var(--accent-dark);
-
+  --color-accent-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
   --font-display: var(--font-oswald);
   --font-sans: var(--font-inter);
 }
@@ -31,28 +31,60 @@
   box-sizing: border-box;
 }
 
-html,
-body {
-  height: 100%;
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-oswald), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
 }
 
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
+.animate-toast-in {
+  animation: toast-in 0.22s ease-out;
+}
 
-.animate-in {
-  animation: toast-in 0.2s ease-out;
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 1s linear infinite;
 }

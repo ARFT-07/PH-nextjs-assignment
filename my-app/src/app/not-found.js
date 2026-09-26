@@ -3,22 +3,21 @@ import { Dumbbell } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface text-accent">
-        <Dumbbell className="h-7 w-7" strokeWidth={2.5} />
-      </span>
-      <h1 className="font-display text-4xl font-bold uppercase text-white">
-        404 — Not Found
+    <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center gap-4 px-4 text-center">
+      <Dumbbell className="h-12 w-12 text-accent" />
+      <p className="font-display text-6xl font-bold text-foreground">404</p>
+      <h1 className="font-display text-xl font-bold uppercase tracking-wide text-foreground">
+        Set Not Found
       </h1>
-      <p className="max-w-sm text-sm text-muted">
-        This lift doesn&apos;t exist in the library. Head back and pick
-        something that does.
+      <p className="text-sm text-muted">
+        The page you&apos;re looking for doesn&apos;t exist, or the workout may
+        have been removed from the library.
       </p>
       <Link
         href="/"
-        className="mt-2 inline-flex items-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-bold uppercase tracking-wide text-background transition-transform hover:-translate-y-0.5"
+        className="mt-2 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 font-display text-sm font-bold uppercase tracking-wider text-accent-foreground transition-transform hover:scale-105"
       >
-        Go to Workouts
+        Back to Workouts
       </Link>
     </div>
   );
