@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { Dumbbell } from "lucide-react";
 import CategoryTag from "@/components/CategoryTag";
 import KeySpecs from "@/components/KeySpecs";
 import WorkoutDetailActions from "@/components/WorkoutDetailActions";
+import WorkoutImage from "@/components/WorkoutImage";
 import { fetchWorkoutById } from "@/lib/api";
 
 export default async function WorkoutDetailPage({ params }) {
@@ -21,18 +21,12 @@ export default async function WorkoutDetailPage({ params }) {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="flex aspect-square items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface lg:sticky lg:top-24 lg:h-fit">
-          {workout.image ? (
-            <img
-              src={workout.image}
-              alt={workout.name}
-              className="h-full w-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.nextElementSibling?.classList.remove("hidden");
-              }}
-            />
-          ) : null}
-          <Dumbbell className={`h-24 w-24 text-border ${workout.image ? "hidden" : ""}`} />
+          <WorkoutImage
+            src={workout.image}
+            alt={workout.name}
+            className="h-full w-full object-cover"
+            iconClassName="h-24 w-24 text-border"
+          />
         </div>
 
         <div className="flex flex-col gap-6">

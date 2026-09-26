@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import StatsRow from "@/components/StatsRow";
+import WorkoutImage from "@/components/WorkoutImage";
 import { usePlan } from "@/context/PlanContext";
 
 export default function PlanListItem({ workout, variant }) {
@@ -20,18 +21,12 @@ export default function PlanListItem({ workout, variant }) {
       }`}
     >
       <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-2">
-        {workout.image ? (
-          <img
-            src={workout.image}
-            alt={workout.name}
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-              e.currentTarget.nextElementSibling?.classList.remove("hidden");
-            }}
-          />
-        ) : null}
-        <Dumbbell className={`h-8 w-8 text-border ${workout.image ? "hidden" : ""}`} />
+        <WorkoutImage
+          src={workout.image}
+          alt={workout.name}
+          className="h-full w-full object-cover"
+          iconClassName="h-8 w-8 text-border"
+        />
       </div>
 
       <div className="flex-1">

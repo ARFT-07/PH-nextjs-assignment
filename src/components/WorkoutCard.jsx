@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell } from "lucide-react";
 import CategoryTag from "@/components/CategoryTag";
 import StatsRow from "@/components/StatsRow";
+import WorkoutImage from "@/components/WorkoutImage";
 
 export default function WorkoutCard({ workout }) {
   return (
@@ -12,20 +12,10 @@ export default function WorkoutCard({ workout }) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-colors hover:border-accent/60"
     >
       <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-surface-2">
-        {workout.image ? (
-          <img
-            src={workout.image}
-            alt={workout.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-              e.currentTarget.nextElementSibling?.classList.remove("hidden");
-            }}
-          />
-        ) : null}
-        <Dumbbell
-          className={`h-12 w-12 text-border ${workout.image ? "hidden" : ""}`}
+        <WorkoutImage
+          src={workout.image}
+          alt={workout.name}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </div>
 
